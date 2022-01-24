@@ -1,0 +1,15 @@
+{
+  "name": "space-invaders",
+  "version": "1.0.0",
+  "description": "space-inveders",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Bohdan Shkamarida",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {}
+}

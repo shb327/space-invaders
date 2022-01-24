@@ -1,0 +1,56 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+h2{
+	font-family: Arial, Helvetica, sans-serif;
+	color: #322d29;
+}
+
+p{
+	font-family: Arial, Helvetica, sans-serif;
+	color: #322d29;
+	font-variant: small-caps;
+	font-weight: bold;
+}
+
+.split {
+  height: 100%;
+  width: 50%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  overflow-x: hidden;
+  padding-top: 20px;
+}
+
+.left {
+  left: 0;
+  background-color: #322d29;
+}
+
+.right {
+  right: 0;
+  background-color: #f5c66a;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.centered img {
+  width: 150px;
+}
+
+#space{
+	width: 400px;
+}
+
+#leaderboard{
+	width: 270px;
+}
