@@ -35,13 +35,18 @@
         </div>
         <div class="help">
           <h2>Controls</h2>
-          <dl class="controls">
+          <dl class="controls keys-only">
             <dt><kbd>A</kbd> <kbd>D</kbd> / <kbd>←</kbd> <kbd>→</kbd></dt><dd>Move</dd>
             <dt><kbd>Space</kbd></dt><dd>Shoot</dd>
             <dt><kbd>P</kbd> / <kbd>Esc</kbd></dt><dd>Pause</dd>
             <dt><kbd>M</kbd></dt><dd>Sound on/off</dd>
             <dt><kbd>Enter</kbd></dt><dd>Start</dd>
           </dl>
+          <dl class="controls touch-only">
+            <dt><kbd>◀</kbd> <kbd>▶</kbd></dt><dd>Move</dd>
+            <dt><kbd>Fire</kbd></dt><dd>Shoot, hold to keep firing</dd>
+          </dl>
+          <p class="touch-only portrait-hint">Tip: turn your phone sideways for a bigger view</p>
         </div>
       </div>
     </section>
@@ -68,6 +73,17 @@
           <button class="btn" data-action="start">Restart</button>
           <button class="img-btn" data-action="menu"><img src="assets/img/quit.png" alt="Quit"></button>
         </div>
+      </div>
+      <div class="touch">
+        <div class="touch-move">
+          <button class="touch-btn" data-hold="left" aria-label="Move left">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-8 7 8 7z"/></svg>
+          </button>
+          <button class="touch-btn" data-hold="right" aria-label="Move right">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l8 7-8 7z"/></svg>
+          </button>
+        </div>
+        <button class="touch-btn touch-fire" data-hold="fire" aria-label="Shoot">Fire</button>
       </div>
     </section>
 

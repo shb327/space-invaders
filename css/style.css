@@ -28,6 +28,7 @@ body {
   font-family: var(--body);
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 [hidden] {
@@ -160,9 +161,10 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: 32px;
   padding: 32px 16px;
+  overflow-y: auto;
 }
 
 .menu-side {
@@ -241,6 +243,10 @@ kbd {
   .title {
     width: min(300px, 40vw);
   }
+
+  .stats-best {
+    font-size: 3.5rem;
+  }
 }
 
 /* Game */
@@ -305,6 +311,135 @@ canvas {
   font-size: 4rem;
   line-height: 1;
   margin-bottom: 8px;
+}
+
+/* Touch controls */
+
+.touch,
+.touch-only {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .keys-only {
+    display: none;
+  }
+
+  .touch-only {
+    display: grid;
+  }
+
+  .touch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+.touch-move {
+  display: flex;
+  gap: 12px;
+}
+
+.touch-btn {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  background: var(--dark-2);
+  color: var(--sand);
+  touch-action: none;
+  transition: transform 0.06s ease, background 0.06s ease;
+}
+
+.touch-btn svg {
+  width: 34px;
+  height: 34px;
+  fill: currentColor;
+}
+
+.touch-fire {
+  width: 100px;
+  border-radius: 50%;
+  height: 100px;
+  background: var(--orange);
+  color: #fff3d6;
+  font-family: var(--display);
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
+}
+
+.touch-btn.active {
+  transform: scale(0.94);
+  background: #4a423b;
+}
+
+.touch-fire.active {
+  background: #d93d10;
+}
+
+.portrait-hint {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+@media (pointer: coarse) and (orientation: landscape) {
+  .touch {
+    position: absolute;
+    left: max(16px, env(safe-area-inset-left));
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    pointer-events: none;
+  }
+
+  .touch-btn {
+    width: 64px;
+    height: 64px;
+    pointer-events: auto;
+    background: rgb(61 55 50 / 0.85);
+  }
+
+  .touch-move {
+    gap: 10px;
+  }
+
+  .touch-fire {
+    width: 88px;
+    height: 88px;
+    background: rgb(253 75 22 / 0.9);
+  }
+
+  .portrait-hint {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .hud {
+    gap: 12px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-height: 480px) {
+  :root {
+    --btn-height: 46px;
+  }
+
+  .game {
+    gap: 8px;
+  }
+
+  .pause h2 {
+    font-size: 2.6rem;
+  }
 }
 
 /* End screens */

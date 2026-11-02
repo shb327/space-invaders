@@ -24,6 +24,7 @@ const images = Object.fromEntries(
 
 const sound = new Sound();
 const input = new Input();
+for (const button of document.querySelectorAll('[data-hold]')) input.bindButton(button, button.dataset.hold);
 const game = new Game($('canvas'), images, input, {
   shot: () => sound.effect('shot'),
   kill: () => sound.effect('explosion'),

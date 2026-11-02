@@ -31,6 +31,27 @@ export class Input {
     this.firing = down;
   }
 
+  // Hold-to-press on-screen buttons; pointer capture keeps multi-touch working.
+  bindButton(element, name) {
+    const set = (down) => (event) => {
+      if (down && !this.enabled) return;
+      event.preventDefault();
+      if (name === 'fire') this.press(down);
+      else this[name] = down;
+      element.classList.toggle('active', down);
+    };
+    element.addEventListener('pointerdown', (event) => {
+      set(true)(event);
+      try {
+        element.setPointerCapture(event.pointerId);
+      } catch {}
+    });
+    for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+      element.addEventListener(type, set(false));
+    }
+    element.addEventListener('contextmenu', (event) => event.preventDefault());
+  }
+
   reset() {
     this.left = this.right = this.firing = this.#queued = false;
   }
