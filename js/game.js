@@ -83,8 +83,9 @@ export class Game {
   }
 
   #tick = (now) => {
-    // Clamp the step so a long frame (tab switch, slow device) can't teleport enemies.
-    const dt = Math.min((now - this.#last) / 1000, 0.05);
+    // rAF timestamps can be slightly older than performance.now(), and a long frame
+    // (slow device, tab switch) shouldn't teleport enemies, so clamp both ends.
+    const dt = Math.min(Math.max((now - this.#last) / 1000, 0), 0.05);
     this.#last = now;
     this.update(dt);
     if (!this.running) return;
@@ -129,7 +130,8 @@ export class Game {
   moveFormation(dt) {
     const kills = this.total - this.enemies.length;
     this.offset.x += this.direction * (BASE_SPEED + SPEED_PER_KILL * kills) * dt;
-    if (this.offset.x >= SWAY || this.offset.x <= 0) {
+    const atEdge = this.direction > 0 ? this.offset.x >= SWAY : this.offset.x <= 0;
+    if (atEdge) {
       this.offset.x = Math.min(Math.max(this.offset.x, 0), SWAY);
       this.direction *= -1;
       this.offset.y += DROP;
