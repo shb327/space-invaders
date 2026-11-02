@@ -223,12 +223,6 @@ const update = () => {
     if (leftToKill < 1){
         clearInterval(intervalId);
         leftToKill = 1;
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/updateLeaderboard", true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.send(JSON.stringify({
-            score: activeTimeUnits+score
-        }));
         window.location.assign("/winMenu");
     }
 }
