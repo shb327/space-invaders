@@ -1,228 +1,169 @@
-var canvas = document.getElementsByTagName("canvas")[0];
-var context = canvas.getContext("2d");
+import { Enemy, Ship } from './entities.js';
 
-canvas.width  = window.innerWidth;
-canvas.height = window.innerHeight;
+export const WORLD = { width: 1360, height: 850 };
 
-var activeTimeUnits = 0;
-var enemySpeed = 1;
+const INVASION_LINE = WORLD.height * 0.65;
+const SWAY = 200;
+const DROP = 55;
+const BASE_SPEED = 60;
+const SPEED_PER_KILL = 6;
+const FIRE_DELAY = 0.2;
+const PAR_TIME = 60;
 
-const countActiveTimeUnits = () => {
-    activeTimeUnits++;
-}
-var intervalId = setInterval(countActiveTimeUnits, 1000);
+const WAVE = [
+  { image: 'shuttle', count: 5, gap: 242, y: 20, size: 120, health: 3, points: 30 },
+  { image: 'warship', count: 10, gap: 111, y: 140, size: 80, health: 2, points: 20 },
+  { image: 'ufo', count: 20, gap: 55, y: 250, size: 40, health: 1, points: 10 },
+];
 
-var leftButton = false;
-var rightButton = false;
-var spaceButton = false;
+const rowWidth = ({ count, gap, size }) => (count - 1) * gap + size;
+const FORMATION_WIDTH = Math.max(...WAVE.map(rowWidth));
+const FORMATION_LEFT = (WORLD.width - FORMATION_WIDTH - SWAY) / 2;
 
-const buttonPressed = (event) => {
-    if (event.keyCode == 65) leftButton = true;
-    if (event.keyCode == 68) rightButton = true;
-}
+export class Game {
+  running = false;
+  #frame = 0;
+  #last = 0;
 
-const buttonReleased = (event) => {
-    if (event.keyCode == 65) leftButton = false;
-    if (event.keyCode == 68) rightButton = false;
-    if (event.keyCode == 32) spaceButton = true;
-}
+  constructor(canvas, images, input, events = {}) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.images = images;
+    this.input = input;
+    this.events = events;
+    this.background = this.ctx.createPattern(images.back, 'repeat');
+    this.scale = 1;
+  }
 
-document.addEventListener("keydown", buttonPressed, false);
-document.addEventListener("keyup", buttonReleased, false);
+  get enemiesLeft() {
+    return this.enemies.length;
+  }
 
-var enemySpeed = 1;
+  start() {
+    this.ship = new Ship(this.images.ship, WORLD.width, WORLD.height);
+    this.rockets = [];
+    this.enemies = WAVE.flatMap((row) => {
+      const left = FORMATION_LEFT + (FORMATION_WIDTH - rowWidth(row)) / 2;
+      return Array.from({ length: row.count }, (_, i) =>
+        new Enemy(this.images[row.image], left + i * row.gap, row.y, row));
+    });
+    this.total = this.enemies.length;
+    this.offset = { x: 0, y: 0 };
+    this.direction = 1;
+    this.score = 0;
+    this.time = 0;
+    this.cooldown = 0;
+    this.events.change?.(this);
+    this.resume();
+  }
 
-var score = 0;
-var running = true;
+  resume() {
+    cancelAnimationFrame(this.#frame);
+    this.running = true;
+    this.#last = performance.now();
+    this.#frame = requestAnimationFrame(this.#tick);
+  }
 
-const UFO_COUNT = 20;
-const WAR_COUNT = 10;
-const SHUT_COUNT = 5;
+  stop() {
+    this.running = false;
+    cancelAnimationFrame(this.#frame);
+  }
 
-var leftToKill = UFO_COUNT + WAR_COUNT + SHUT_COUNT;
+  fit(width, height) {
+    const scale = Math.min(width / WORLD.width, height / WORLD.height);
+    const cssWidth = Math.floor(WORLD.width * scale);
+    const cssHeight = Math.floor(WORLD.height * scale);
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.style.width = `${cssWidth}px`;
+    this.canvas.style.height = `${cssHeight}px`;
+    this.canvas.width = Math.round(cssWidth * dpr);
+    this.canvas.height = Math.round(cssHeight * dpr);
+    this.scale = this.canvas.width / WORLD.width;
+    if (this.ship) this.draw();
+  }
 
-const BOTTOM_LINE = canvas.height - (canvas.height*0.35);
+  #tick = (now) => {
+    // Clamp the step so a long frame (tab switch, slow device) can't teleport enemies.
+    const dt = Math.min((now - this.#last) / 1000, 0.05);
+    this.#last = now;
+    this.update(dt);
+    if (!this.running) return;
+    this.draw();
+    this.#frame = requestAnimationFrame(this.#tick);
+  };
 
-class Ship {
-    constructor() {
-        this.image.src = "assets/img/ship.png";
+  update(dt) {
+    this.time += dt;
+    this.ship.update(dt, this.input.direction);
+
+    this.cooldown -= dt;
+    if (this.cooldown <= 0 && this.input.takeShot()) {
+      this.rockets.push(this.ship.fire(this.images.rocket));
+      this.cooldown = FIRE_DELAY;
+      this.events.shot?.();
     }
-    image = new Image();
-    position = { x: 20, y: canvas.height - 95};
-    speed = 5;
-    min = 20;
-    max = canvas.width - 95;
-    draw = () => {
-        context.drawImage(this.image, this.position.x, this.position.y, 75, 75);
-    }
-    update = () => {
-        if (rightButton && this.position.x < this.max){
-            this.position.x += this.speed;
-        }
-        else if (leftButton && this.position.x > this.min){
-            this.position.x -= this.speed;
-        }
-        if (spaceButton) {
-            rockets.push(new Rocket(JSON.parse(JSON.stringify(this.position))));
-            var audio = document.getElementById('audio1');
-            if (audio.paused) {
-              audio.play();
-            }else{
-              audio.currentTime = 0
-            }
-            spaceButton = false;
-        }
-    }
-}
 
-class Rocket{
-    constructor(position)
-    {
-        this.position = {x: position.x + 35, y: position.y + 10};
-        this.speed = 8;
-        this.image = new Image();
-        this.image.src = "assets/img/rocket.png";
+    this.moveFormation(dt);
+
+    for (const rocket of this.rockets) {
+      rocket.update(dt);
+      const target = this.enemies.find((enemy) => enemy.contains(rocket.x, rocket.y, this.offset));
+      if (!target) continue;
+      rocket.hit = true;
+      target.hit();
+      if (target.dead) this.kill(target);
     }
-    draw = () => {
-        context.drawImage(this.image, this.position.x,  this.position.y, 5, 5);
+    this.rockets = this.rockets.filter((rocket) => !rocket.gone);
+    this.enemies = this.enemies.filter((enemy) => !enemy.dead);
+
+    if (this.enemies.length === 0) {
+      this.end(true);
+    } else if (this.enemies.some((enemy) => enemy.y + this.offset.y >= INVASION_LINE)) {
+      this.end(false);
     }
-    update = () => {
-        this.position.y -= this.speed;
+  }
+
+  moveFormation(dt) {
+    const kills = this.total - this.enemies.length;
+    this.offset.x += this.direction * (BASE_SPEED + SPEED_PER_KILL * kills) * dt;
+    if (this.offset.x >= SWAY || this.offset.x <= 0) {
+      this.offset.x = Math.min(Math.max(this.offset.x, 0), SWAY);
+      this.direction *= -1;
+      this.offset.y += DROP;
     }
-}
+  }
 
-class Enemy {
-    constructor(position, location, img, size, health, points) {
-        this.image.src = img;
-        this.position = position;
-        this.min = this.position.x;
-        this.max = this.position.x + canvas.width-1150;
-        this.location = location;
-        this.size = size;
-        this.health = health;
-        this.points = points;
-    }
-    image = new Image();
-    position = { x: 20, y: canvas.height - (canvas.height*0.01) };
-    direction = true;
-    min = 20;
-    max = canvas.width - 95;
-    draw = () => {
-        context.drawImage(this.image, this.position.x, this.position.y, this.size, this.size);
-    }
-    update = () => {
-        if (this.direction && this.position.x < this.max){
-            this.position.x += enemySpeed;
-            if (this.position.x >= this.max) {
-                this.direction = !this.direction;
-                this.position.y += 55;
-            }
-        }else if (!this.direction && this.position.x > this.min){
-            this.position.x -= enemySpeed;
-            if (this.position.x <= this.min) {
-                this.direction = !this.direction;
-                this.position.y += 55;
-            }
-        }
-        if (this.position.y >= BOTTOM_LINE){
-            running = false;
-            window.location.assign("lose.html");
-        }
-        rockets.forEach((rocket, i) => {
-            if (rocket != null && rocket.position.x >= this.position.x && rocket.position.x < this.position.x + this.size
-                && rocket.position.y >= this.position.y && rocket.position.y < this.position.y + this.size){
-                    this.collision();
-                    rockets[i] = null;
-                }
-        });
-    }
-    collision = () => {
-       if(--this.health < 1){
-        rows[this.location.y][this.location.x] = null;
-        leftToKill--;
-        var audio = document.getElementById('audio2');
-        if (audio.paused) {
-          audio.play();
-        }else{
-          audio.currentTime = 0
-        }
-        enemySpeed += 0.1;
-        score += this.points;
-      }
-    }
-}
+  kill(enemy) {
+    this.score += enemy.points;
+    this.events.kill?.();
+    this.events.change?.(this);
+  }
 
-var background = new Image();
-background.src = "assets/img/back.jpg";
-var ship = new Ship();
-var rockets = [];
-var rows = []
+  end(won) {
+    this.stop();
+    const seconds = Math.round(this.time);
+    const bonus = won ? Math.max(0, PAR_TIME - seconds) * 5 : 0;
+    this.events.end?.({ won, seconds, bonus, score: this.score + bonus });
+  }
 
-var shuttles = [];
-var wars = [];
-var ufos = [];
+  draw() {
+    const { ctx } = this;
+    ctx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
+    ctx.fillStyle = this.background;
+    ctx.fillRect(0, 0, WORLD.width, WORLD.height);
 
-for (var i = 0; i < UFO_COUNT; i++){
-    ufos.push(new Enemy({x: 20 + 55 * i, y: 250}, {x:i, y:2}, "assets/img/ufo.png", 40, 1, 10));
-}
-for (var i = 0; i < WAR_COUNT; i++){
-    wars.push(new Enemy({x: 20 + 111 * i, y: 140}, {x:i, y:1}, "assets/img/warship.png", 80, 2, 20));
-}
-for (var i = 0; i < SHUT_COUNT; i++){
-    shuttles.push(new Enemy({x: 20 + 242 * i, y: 20}, {x:i, y:0}, "assets/img/shuttle.png", 120, 3, 30));
-}
+    ctx.save();
+    ctx.strokeStyle = 'rgb(245 198 106 / 0.2)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([14, 12]);
+    ctx.beginPath();
+    ctx.moveTo(0, INVASION_LINE);
+    ctx.lineTo(WORLD.width, INVASION_LINE);
+    ctx.stroke();
+    ctx.restore();
 
-rows.push(shuttles);
-rows.push(wars);
-rows.push(ufos);
-
-window.onload = () => {
-    window.requestAnimationFrame(gameLoop);
-}
-
-const gameLoop = () => {
-    draw();
-    update();
-    if (running){
-        window.requestAnimationFrame(gameLoop);
-    }
-}
-
-const draw = () => {
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(background, 0, 0, canvas.width, canvas.height);
-    ship.draw();
-    shuttles.forEach(enemy => {if(enemy != null){
-      enemy.draw()
-    }});
-    wars.forEach(enemy => {if (enemy != null){
-      enemy.draw()
-    }});
-    ufos.forEach(enemy => {if (enemy != null){
-      enemy.draw()}});
-    rockets.forEach(rocket => {if (rocket != null){
-      rocket.draw()
-    }});
-}
-
-const update = () => {
-    ship.update();
-    shuttles.forEach(enemy => {if (enemy != null){
-      enemy.update()
-    }});
-    wars.forEach(enemy => {if (enemy != null){
-      enemy.update()
-    }});
-    ufos.forEach(enemy => {if (enemy != null){
-      enemy.update()
-    }});
-    rockets.forEach(rocket => {if (rocket != null){
-      rocket.update()
-    }});
-
-    if (leftToKill < 1){
-        clearInterval(intervalId);
-        leftToKill = 1;
-        window.location.assign("win.html");
-    }
+    for (const enemy of this.enemies) enemy.draw(ctx, this.offset);
+    for (const rocket of this.rockets) rocket.draw(ctx);
+    this.ship.draw(ctx);
+  }
 }
