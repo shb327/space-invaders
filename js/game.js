@@ -45,7 +45,7 @@ const BOTTOM_LINE = canvas.height - (canvas.height*0.35);
 
 class Ship {
     constructor() {
-        this.image.src = "imgs/ship.png";
+        this.image.src = "assets/img/ship.png";
     }
     image = new Image();
     position = { x: 20, y: canvas.height - 95};
@@ -81,7 +81,7 @@ class Rocket{
         this.position = {x: position.x + 35, y: position.y + 10};
         this.speed = 8;
         this.image = new Image();
-        this.image.src = "imgs/rocket.png";
+        this.image.src = "assets/img/rocket.png";
     }
     draw = () => {
         context.drawImage(this.image, this.position.x,  this.position.y, 5, 5);
@@ -126,7 +126,7 @@ class Enemy {
         }
         if (this.position.y >= BOTTOM_LINE){
             running = false;
-            window.location.assign("/loseMenu");
+            window.location.assign("lose.html");
         }
         rockets.forEach((rocket, i) => {
             if (rocket != null && rocket.position.x >= this.position.x && rocket.position.x < this.position.x + this.size
@@ -153,7 +153,7 @@ class Enemy {
 }
 
 var background = new Image();
-background.src = "imgs/back.jpg";
+background.src = "assets/img/back.jpg";
 var ship = new Ship();
 var rockets = [];
 var rows = []
@@ -163,13 +163,13 @@ var wars = [];
 var ufos = [];
 
 for (var i = 0; i < UFO_COUNT; i++){
-    ufos.push(new Enemy({x: 20 + 55 * i, y: 250}, {x:i, y:2}, "imgs/ufo.png", 40, 1, 10));
+    ufos.push(new Enemy({x: 20 + 55 * i, y: 250}, {x:i, y:2}, "assets/img/ufo.png", 40, 1, 10));
 }
 for (var i = 0; i < WAR_COUNT; i++){
-    wars.push(new Enemy({x: 20 + 111 * i, y: 140}, {x:i, y:1}, "imgs/warship.png", 80, 2, 20));
+    wars.push(new Enemy({x: 20 + 111 * i, y: 140}, {x:i, y:1}, "assets/img/warship.png", 80, 2, 20));
 }
 for (var i = 0; i < SHUT_COUNT; i++){
-    shuttles.push(new Enemy({x: 20 + 242 * i, y: 20}, {x:i, y:0}, "imgs/shuttle.png", 120, 3, 30));
+    shuttles.push(new Enemy({x: 20 + 242 * i, y: 20}, {x:i, y:0}, "assets/img/shuttle.png", 120, 3, 30));
 }
 
 rows.push(shuttles);
@@ -223,6 +223,6 @@ const update = () => {
     if (leftToKill < 1){
         clearInterval(intervalId);
         leftToKill = 1;
-        window.location.assign("/winMenu");
+        window.location.assign("win.html");
     }
 }
