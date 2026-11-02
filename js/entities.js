@@ -25,6 +25,39 @@ export class Ship {
   }
 }
 
+export class Spark {
+  static COLORS = ['#fd4b16', '#f08a2c', '#f5c66a'];
+  static LIFE = 0.5;
+
+  constructor(x, y, index) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 80 + Math.random() * 220;
+    this.x = x;
+    this.y = y;
+    this.vx = Math.cos(angle) * speed;
+    this.vy = Math.sin(angle) * speed;
+    this.life = Spark.LIFE;
+    this.color = Spark.COLORS[index % Spark.COLORS.length];
+  }
+
+  get gone() {
+    return this.life <= 0;
+  }
+
+  update(dt) {
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.life -= dt;
+  }
+
+  draw(ctx) {
+    ctx.globalAlpha = Math.max(0, this.life / Spark.LIFE);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x - 3, this.y - 3, 6, 6);
+    ctx.globalAlpha = 1;
+  }
+}
+
 export class Rocket {
   static SPEED = 480;
   static WIDTH = 5;
@@ -52,6 +85,10 @@ export class Rocket {
 }
 
 export class Enemy {
+  static FLASH = 0.12;
+
+  flash = 0;
+
   constructor(image, x, y, { size, health, points }) {
     this.image = image;
     this.x = x;
@@ -73,9 +110,16 @@ export class Enemy {
 
   hit() {
     this.health--;
+    this.flash = Enemy.FLASH;
+  }
+
+  update(dt) {
+    this.flash = Math.max(0, this.flash - dt);
   }
 
   draw(ctx, offset) {
+    ctx.globalAlpha = this.flash > 0 ? 0.4 : 1;
     ctx.drawImage(this.image, this.x + offset.x, this.y + offset.y, this.size, this.size);
+    ctx.globalAlpha = 1;
   }
 }

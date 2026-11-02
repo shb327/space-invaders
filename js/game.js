@@ -1,4 +1,4 @@
-import { Enemy, Ship } from './entities.js';
+import { Enemy, Ship, Spark } from './entities.js';
 
 export const WORLD = { width: 1360, height: 850 };
 
@@ -41,6 +41,7 @@ export class Game {
   start() {
     this.ship = new Ship(this.images.ship, WORLD.width, WORLD.height);
     this.rockets = [];
+    this.sparks = [];
     this.enemies = WAVE.flatMap((row) => {
       const left = FORMATION_LEFT + (FORMATION_WIDTH - rowWidth(row)) / 2;
       return Array.from({ length: row.count }, (_, i) =>
@@ -103,6 +104,8 @@ export class Game {
     }
 
     this.moveFormation(dt);
+    for (const enemy of this.enemies) enemy.update(dt);
+    for (const spark of this.sparks) spark.update(dt);
 
     for (const rocket of this.rockets) {
       rocket.update(dt);
@@ -113,6 +116,7 @@ export class Game {
       if (target.dead) this.kill(target);
     }
     this.rockets = this.rockets.filter((rocket) => !rocket.gone);
+    this.sparks = this.sparks.filter((spark) => !spark.gone);
     this.enemies = this.enemies.filter((enemy) => !enemy.dead);
 
     if (this.enemies.length === 0) {
@@ -133,6 +137,9 @@ export class Game {
   }
 
   kill(enemy) {
+    const x = enemy.x + this.offset.x + enemy.size / 2;
+    const y = enemy.y + this.offset.y + enemy.size / 2;
+    for (let i = 0; i < 16; i++) this.sparks.push(new Spark(x, y, i));
     this.score += enemy.points;
     this.events.kill?.();
     this.events.change?.(this);
@@ -166,6 +173,7 @@ export class Game {
 
     for (const enemy of this.enemies) enemy.draw(ctx, this.offset);
     for (const rocket of this.rockets) rocket.draw(ctx);
+    for (const spark of this.sparks) spark.draw(ctx);
     this.ship.draw(ctx);
   }
 }
