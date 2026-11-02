@@ -6,6 +6,7 @@
   --orange: #fd4b16;
   --display: "Bebas Neue", Impact, "Arial Narrow", sans-serif;
   --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --btn-height: 58px;
 }
 
 *,
@@ -58,29 +59,32 @@ button:focus-visible {
 
 .img-btn {
   display: block;
-  width: 200px;
   transition: transform 0.12s ease;
 }
 
 .img-btn img {
   display: block;
-  width: 100%;
+  height: var(--btn-height);
   border-radius: 12px;
+}
+
+.img-btn-large img {
+  height: calc(var(--btn-height) * 1.35);
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 200px;
-  aspect-ratio: 900 / 257;
+  min-width: 200px;
+  height: var(--btn-height);
+  padding: 0.1em 0.5em 0;
   border-radius: 12px;
   background: var(--button);
   color: var(--dark);
   font-family: var(--display);
-  font-size: 2.6rem;
+  font-size: 2.8rem;
   line-height: 1;
-  padding-top: 0.1em;
   transition: transform 0.12s ease;
 }
 
@@ -99,7 +103,51 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--dark-2);
+  color: var(--sand);
+  transition: background 0.12s ease;
+}
+
+.icon-btn:hover {
+  background: #4a423b;
+}
+
+.icon-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.sound-toggle path:not(:first-child) {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.sound-toggle[aria-pressed="true"] .off,
+.sound-toggle[aria-pressed="false"] .on {
+  display: none;
+}
+
 /* Menu */
+
+.corner {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 1;
+}
+
+.corner .icon-btn {
+  background: var(--dark);
+}
 
 .menu {
   display: grid;
@@ -212,6 +260,12 @@ kbd {
   letter-spacing: 0.04em;
 }
 
+.hud-buttons {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .hud b {
   font-weight: 400;
   color: #fff3d6;
@@ -231,6 +285,26 @@ canvas {
   border-radius: 12px;
   box-shadow: 0 0 0 2px var(--dark-2), 0 20px 60px rgb(0 0 0 / 0.35);
   touch-action: none;
+}
+
+.pause {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: rgb(50 45 41 / 0.82);
+  backdrop-filter: blur(4px);
+}
+
+.pause h2 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 8px;
 }
 
 /* End screens */

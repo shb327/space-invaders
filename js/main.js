@@ -1,7 +1,7 @@
 import { Game } from './game.js';
 import { Input } from './input.js';
 import { Sound } from './sound.js';
-import { getStats, recordScore } from './storage.js';
+import { getPreference, getStats, recordScore, setPreference } from './storage.js';
 
 const IMAGES = {
   back: 'back.jpg',
@@ -15,6 +15,7 @@ const IMAGES = {
 const $ = (selector) => document.querySelector(selector);
 const screens = [...document.querySelectorAll('.screen')];
 const viewport = $('.viewport');
+const pauseMenu = $('#pause');
 const hud = { score: $('#hud-score'), left: $('#hud-left'), best: $('#hud-best') };
 
 const images = Object.fromEntries(
@@ -33,8 +34,12 @@ const game = new Game($('canvas'), images, input, {
   end: showEnd,
 });
 
+let current = 'menu';
+
 function show(id) {
+  current = id;
   for (const screen of screens) screen.hidden = screen.id !== id;
+  pauseMenu.hidden = true;
   input.enabled = id === 'game';
   input.reset();
 }
@@ -44,6 +49,22 @@ function start() {
   show('game');
   fit();
   game.start();
+}
+
+function pause() {
+  if (current !== 'game' || !game.running) return;
+  game.stop();
+  input.enabled = false;
+  input.reset();
+  pauseMenu.hidden = false;
+  pauseMenu.querySelector('button').focus();
+}
+
+function resume() {
+  if (current !== 'game' || game.running) return;
+  pauseMenu.hidden = true;
+  input.enabled = true;
+  game.resume();
 }
 
 function showEnd({ won, score, seconds, bonus }) {
@@ -64,20 +85,48 @@ function menu() {
   show('menu');
 }
 
+function setSound(enabled) {
+  sound.enabled = enabled;
+  setPreference('sound', enabled);
+  for (const button of document.querySelectorAll('.sound-toggle')) {
+    button.setAttribute('aria-pressed', enabled);
+  }
+}
+
 function fit() {
   const { width, height } = viewport.getBoundingClientRect();
   if (width && height) game.fit(width, height);
 }
 
-const actions = { start, menu };
+const actions = {
+  start,
+  menu,
+  resume,
+  pause,
+  sound: () => setSound(!sound.enabled),
+};
+
+const KEYS = {
+  Enter: () => current !== 'game' && start(),
+  Escape: () => (game.running ? pause() : resume()),
+  KeyP: () => (game.running ? pause() : resume()),
+  KeyM: () => setSound(!sound.enabled),
+};
 
 document.addEventListener('click', (event) => {
-  const action = event.target.closest('[data-action]')?.dataset.action;
-  actions[action]?.();
+  const button = event.target.closest('[data-action]');
+  if (!button) return;
+  actions[button.dataset.action]();
+  // Drop focus so Space keeps shooting instead of pressing the button again.
+  button.blur();
 });
 document.addEventListener('keydown', (event) => {
-  if (event.code === 'Enter' && !input.enabled && !event.target.closest('button')) start();
+  if (event.repeat || (event.code === 'Enter' && event.target.closest('button'))) return;
+  KEYS[event.code]?.();
 });
+document.addEventListener('visibilitychange', () => document.hidden && pause());
+window.addEventListener('blur', pause);
 new ResizeObserver(fit).observe(viewport);
 
+setSound(getPreference('sound', true));
 menu();

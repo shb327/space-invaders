@@ -25,3 +25,18 @@ export function recordScore(score) {
   } catch {}
   return { ...stats, isBest };
 }
+
+export function getPreference(name, fallback) {
+  try {
+    const value = localStorage.getItem(`space-invaders:${name}`);
+    return value === null ? fallback : JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+export function setPreference(name, value) {
+  try {
+    localStorage.setItem(`space-invaders:${name}`, JSON.stringify(value));
+  } catch {}
+}

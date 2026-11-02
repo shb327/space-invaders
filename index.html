@@ -16,9 +16,14 @@
 <body>
   <main>
     <section id="menu" class="screen menu">
+      <div class="corner">
+        <button class="icon-btn sound-toggle" data-action="sound" aria-label="Sound" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9.5l5 5m0-5l-5 5"/></svg>
+        </button>
+      </div>
       <div class="menu-main">
         <h1><img class="title" src="assets/img/space.png" alt="Space Invaders"></h1>
-        <button class="img-btn" data-action="start">
+        <button class="img-btn img-btn-large" data-action="start">
           <img src="assets/img/start.png" alt="Start">
         </button>
       </div>
@@ -33,6 +38,8 @@
           <dl class="controls">
             <dt><kbd>A</kbd> <kbd>D</kbd> / <kbd>←</kbd> <kbd>→</kbd></dt><dd>Move</dd>
             <dt><kbd>Space</kbd></dt><dd>Shoot</dd>
+            <dt><kbd>P</kbd> / <kbd>Esc</kbd></dt><dd>Pause</dd>
+            <dt><kbd>M</kbd></dt><dd>Sound on/off</dd>
             <dt><kbd>Enter</kbd></dt><dd>Start</dd>
           </dl>
         </div>
@@ -44,9 +51,23 @@
         <span>Score <b id="hud-score">0</b></span>
         <span>Enemies <b id="hud-left">0</b></span>
         <span>Best <b id="hud-best">0</b></span>
+        <div class="hud-buttons">
+          <button class="icon-btn sound-toggle" data-action="sound" aria-label="Sound" aria-pressed="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path class="on" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9.5l5 5m0-5l-5 5"/></svg>
+          </button>
+          <button class="icon-btn" data-action="pause" aria-label="Pause">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          </button>
+        </div>
       </div>
       <div class="viewport">
         <canvas aria-label="Game"></canvas>
+        <div class="pause" id="pause" hidden>
+          <h2>Paused</h2>
+          <button class="btn" data-action="resume">Resume</button>
+          <button class="btn" data-action="start">Restart</button>
+          <button class="img-btn" data-action="menu"><img src="assets/img/quit.png" alt="Quit"></button>
+        </div>
       </div>
     </section>
 
