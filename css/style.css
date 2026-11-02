@@ -134,6 +134,25 @@ button:focus-visible {
   letter-spacing: 0.02em;
 }
 
+.stats,
+.help {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.stats-best {
+  font-family: var(--display);
+  font-size: 5rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats-last {
+  font-weight: 600;
+  opacity: 0.75;
+}
+
 .controls {
   display: grid;
   grid-template-columns: auto auto;
@@ -241,6 +260,13 @@ canvas {
   font-family: var(--display);
   font-size: 2.4rem;
   letter-spacing: 0.04em;
+}
+
+.end-detail {
+  margin-top: -16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  opacity: 0.8;
 }
 
 .end-actions {

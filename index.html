@@ -18,16 +18,24 @@
     <section id="menu" class="screen menu">
       <div class="menu-main">
         <h1><img class="title" src="assets/img/space.png" alt="Space Invaders"></h1>
-        <button class="img-btn" data-action="start" autofocus>
+        <button class="img-btn" data-action="start">
           <img src="assets/img/start.png" alt="Start">
         </button>
       </div>
       <div class="menu-side">
-        <h2>Controls</h2>
-        <dl class="controls">
-          <dt><kbd>A</kbd> <kbd>D</kbd> / <kbd>←</kbd> <kbd>→</kbd></dt><dd>Move</dd>
-          <dt><kbd>Space</kbd></dt><dd>Shoot</dd>
-        </dl>
+        <div class="stats">
+          <h2>Personal best</h2>
+          <p class="stats-best" id="menu-best">0</p>
+          <p class="stats-last" id="menu-last">No games yet</p>
+        </div>
+        <div class="help">
+          <h2>Controls</h2>
+          <dl class="controls">
+            <dt><kbd>A</kbd> <kbd>D</kbd> / <kbd>←</kbd> <kbd>→</kbd></dt><dd>Move</dd>
+            <dt><kbd>Space</kbd></dt><dd>Shoot</dd>
+            <dt><kbd>Enter</kbd></dt><dd>Start</dd>
+          </dl>
+        </div>
       </div>
     </section>
 
@@ -35,6 +43,7 @@
       <div class="hud">
         <span>Score <b id="hud-score">0</b></span>
         <span>Enemies <b id="hud-left">0</b></span>
+        <span>Best <b id="hud-best">0</b></span>
       </div>
       <div class="viewport">
         <canvas aria-label="Game"></canvas>
@@ -44,6 +53,7 @@
     <section id="win" class="screen end end-win" hidden>
       <img class="end-art" src="assets/img/win.jpg" alt="Space is saved!">
       <p class="end-score">Score <b data-final-score>0</b></p>
+      <p class="end-detail" data-detail></p>
       <div class="end-actions">
         <button class="btn" data-action="start">Play again</button>
         <button class="img-btn" data-action="menu"><img src="assets/img/mmtwo.png" alt="Main menu"></button>
@@ -53,6 +63,7 @@
     <section id="lose" class="screen end end-lose" hidden>
       <img class="end-art" src="assets/img/lose.jpg" alt="Space is no more!">
       <p class="end-score">Score <b data-final-score>0</b></p>
+      <p class="end-detail" data-detail></p>
       <div class="end-actions">
         <button class="btn btn-dark" data-action="start">Try again</button>
         <button class="img-btn" data-action="menu"><img src="assets/img/mmone.png" alt="Main menu"></button>
