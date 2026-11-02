@@ -31,7 +31,6 @@ export class Game {
     this.images = images;
     this.input = input;
     this.events = events;
-    this.background = this.ctx.createPattern(images.back, 'repeat');
     this.scale = 1;
   }
 
@@ -149,7 +148,10 @@ export class Game {
   draw() {
     const { ctx } = this;
     ctx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
-    ctx.fillStyle = this.background;
+    if (!this.background && this.images.back.complete) {
+      this.background = ctx.createPattern(this.images.back, 'repeat');
+    }
+    ctx.fillStyle = this.background ?? '#322d29';
     ctx.fillRect(0, 0, WORLD.width, WORLD.height);
 
     ctx.save();

@@ -17,15 +17,8 @@ const screens = [...document.querySelectorAll('.screen')];
 const viewport = $('.viewport');
 const hud = { score: $('#hud-score'), left: $('#hud-left'), best: $('#hud-best') };
 
-const loadImage = async (file) => {
-  const image = new Image();
-  image.src = `assets/img/${file}`;
-  await image.decode();
-  return image;
-};
-
 const images = Object.fromEntries(
-  await Promise.all(Object.entries(IMAGES).map(async ([name, file]) => [name, await loadImage(file)])),
+  Object.entries(IMAGES).map(([name, file]) => [name, Object.assign(new Image(), { src: `assets/img/${file}` })]),
 );
 
 const sound = new Sound();
