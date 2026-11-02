@@ -3,10 +3,10 @@ import { Enemy, Ship } from './entities.js';
 export const WORLD = { width: 1360, height: 850 };
 
 const INVASION_LINE = WORLD.height * 0.65;
-const SWAY = 200;
-const DROP = 55;
-const BASE_SPEED = 60;
-const SPEED_PER_KILL = 6;
+const SWAY = 240;
+const DROP = 40;
+const BASE_SPEED = 45;
+const SPEED_PER_KILL = 2.5;
 const FIRE_DELAY = 0.2;
 const PAR_TIME = 60;
 
